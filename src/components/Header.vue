@@ -32,7 +32,7 @@
     <div class="user_div">
           <v-menu offset-y v-model="menu">
             <v-btn flat slot="activator" :ripple="false">
-              <v-avatar>
+              <v-avatar class="userimg">
                 <img src="../assets/user.png" alt="user">
               </v-avatar>
               <span class="username">Ashdown X..</span>
@@ -47,6 +47,12 @@
               <v-list-tile @click="logout">
                 <v-list-tile-title>
                   <span class="pa-2"><v-icon>logout</v-icon></span>Sign out
+                </v-list-tile-title>
+              </v-list-tile>
+              <v-divider/>
+              <v-list-tile @click="admin">
+                <v-list-tile-title>
+                  <span class="pa-2"><v-icon>card_membership</v-icon></span>register
                 </v-list-tile-title>
               </v-list-tile>
             </v-list>
@@ -69,6 +75,9 @@
         },
       profile() {alert('No data available')},
       logout() {alert('No data available')},
+      admin() {
+        this.$router.push({path: '/admin'})
+      }
     },
     props: ['menuList']
   }

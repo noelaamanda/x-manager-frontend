@@ -1,0 +1,47 @@
+@import "./variables";
+
+.contour {
+  flex-direction: column;
+}
+.module {
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+.header {
+  position: fixed;
+  z-index: 2;
+}
+.aside {
+  position: fixed;
+}
+.containerBlock {
+  width: 100%;
+  margin-top: 34px;
+  margin-left: -15px;
+  flex: 1;
+  flex-direction: row;
+  align-items: flex-start;
+  position: fixed;
+}
+.tableBlock {
+  margin-left: -5px;
+}
+.home_btn_in_drawer {
+  background-color: $white_blue_color;
+  position: fixed;
+  bottom: 8%;
+  right: 92%;
+  z-index: 1;
+}
+.home_btn_out_drawer {
+  background-color: $white_blue_color;
+  position: fixed;
+  bottom: 8%;
+  right: 95%;
+}
+#aside {
+  margin-top: -1.1px;
+  z-index: 0;
+  position: relative;
+}

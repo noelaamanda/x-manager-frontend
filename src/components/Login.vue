@@ -51,7 +51,8 @@ export default {
       show: true,
       username: 'admin',
       password: 'admin',
-      remember: false
+      remember: false,
+      entry: {}
     }
   },
   methods: {
@@ -72,7 +73,12 @@ export default {
         })
       }).catch(err => {
         console.log('error : ', err)
-      })*/
+      })*/ this.entry.username = this.username
+      this.entry.password = this.password
+      let uri = "http://localhost:8000/accounts/login/"
+      this.axios.post(uri, this.entry).then((response) => {
+                  alert(response.data)
+              });
       this.$router.push({path: '/home'})
     }
   },

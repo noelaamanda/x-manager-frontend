@@ -2,7 +2,7 @@
   <v-toolbar fixed app dark class="header elevation-0" color="#142841">
     <v-toolbar-title class="mr-5">
       <router-link to="/">
-        <v-icon large class="mr-2">arrow_back</v-icon>
+        <v-icon large class="mr-2">home</v-icon>
         <img src="../assets/xmanager.svg">
       </router-link>
     </v-toolbar-title>

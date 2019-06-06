@@ -75,11 +75,13 @@ export default {
         console.log('error : ', err)
       })*/ this.entry.username = this.username
       this.entry.password = this.password
-      let uri = "http://localhost:8000/accounts/login/"
+      let uri = "http://localhost:8000/api/login/"
       this.axios.post(uri, this.entry).then((response) => {
-                  alert(response.data)
-              });
-      this.$router.push({path: '/home'})
+                 localStorage.setItem('token', response.data.token)
+                 this.$router.push({path: '/home'})
+              }).catch(error => {
+                alert(error)
+            });
     }
   },
 }

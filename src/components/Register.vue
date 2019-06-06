@@ -98,6 +98,7 @@
   </v-app>
 </template>
 
+<script type="text/javascript" src="../../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js"></script>
 <script>
 import Header from './Header'
 export default {
@@ -119,10 +120,15 @@ export default {
       this.$router.push(menu.list)
     },
     register() {
-        alert('ok')
-        /*var KeyHelper = libsignal.KeyHelper;
-
-        var registrationId = KeyHelper.generateRegistrationId();
+      var KeyHelper = libsignal.KeyHelper;
+      alert(KeyHelper)
+      let uri = "http://localhost:8000/api/register/"
+      this.axios.post(uri, this.user).then((response) => {
+                 alert(response.data)
+              }).catch(error => {
+                alert(error)
+            });
+       /* var registrationId = KeyHelper.generateRegistrationId();
         // Store registrationId somewhere durable and safe.
 
         KeyHelper.generateIdentityKeyPair().then(function(identityKeyPair) {

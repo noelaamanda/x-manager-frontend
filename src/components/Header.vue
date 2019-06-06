@@ -74,7 +74,11 @@
           this.$emit('MenuClicked', data)
         },
       profile() {alert('No data available')},
-      logout() {alert('No data available')},
+      logout() {
+        this.axios.get("http://localhost:8000/api/logout/").then((response) => {
+          alert(response.data)
+        })
+      },
       admin() {
         this.$router.push({path: '/admin'})
       }

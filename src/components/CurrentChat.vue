@@ -23,7 +23,10 @@ import {eventBus} from '../main';
       },
       methods: {
           sending: function() {
-                  this.$socket.sendObj({'message':this.msg})
+                  this.$socket.sendObj({
+                      'message':this.msg,
+                      'command': 'fetch_messages'
+                  })
           },
       },
       created: function () {

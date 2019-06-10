@@ -1,7 +1,7 @@
 <template>
   <v-toolbar fixed app dark class="header elevation-0" color="#142841">
     <v-toolbar-title class="mr-5">
-      <router-link to="/">
+      <router-link to="/home">
         <v-icon large class="mr-2">home</v-icon>
         <img src="../assets/xmanager.svg">
       </router-link>

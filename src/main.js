@@ -9,7 +9,7 @@ import VueAxios from 'vue-axios'
 export var eventBus = new Vue();
 
 Vue.use(VueAxios, axios);
-import libsignal from '../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js'
+//import libsignal from '../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js'
 //window.Cookies = require('js-cookie');
 /*import Cookies from 'js-cookie'
 var csrftoken = Cookies.get('csrftoken');

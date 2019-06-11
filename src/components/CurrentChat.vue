@@ -25,7 +25,8 @@ import {eventBus} from '../main';
           sending: function() {
                   this.$socket.sendObj({
                       'message':this.msg,
-                      'command': 'fetch_messages'
+                      'command': 'new_message',
+                      'from': 'Lucas'
                   })
           },
       },
@@ -34,12 +35,19 @@ import {eventBus} from '../main';
                   alert('socket closed')
               },
            this.$socket.onmessage = ({data}) => {
-                    var logs = JSON.parse(data);
-                    alert(logs.message)
+               var logs = JSON.parse(data);
+               for( let i = 0; i<logs['message'].length; i++)
+                    { //alert(logs.message)
                     const Msgctor = Vue.extend(Msgchip)
-                    var instance = new Msgctor({propsData: {msgcontent: logs.message}})
+                    var instance = new Msgctor({
+                        propsData: {
+                            msgcontent: logs['message'][i].content, 
+                            msgauthor: logs['message'][i].author, 
+                            msgtime: logs['message'][i].timestamp
+                            }
+                    })
                     instance.$mount ()
-                    this.$refs.container.appendChild(instance.$el)
+                    this.$refs.container.appendChild(instance.$el)}
                   } 
          alert('created')
          /*Vue.use(VueNativeSock, 'ws://127.0.0.1:8000' + '/ws/chat/' + this.roomname + '/', { format: 'json' }) 

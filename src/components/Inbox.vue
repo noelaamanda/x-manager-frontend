@@ -110,12 +110,18 @@ import {eventBus} from '../main';
               reconnectionDelay: 3000,
             })
                 this.$socket.onopen = () => {
-                alert('connection successful')
+                  this.fetch_messages()
+                  alert('connection successful')
               }
              eventBus.$emit('chatname', sender)
              this.chatlist = false
              //alert(sender)
              this.$router.push({ name: 'CurrentChat', params: {sender} })
+         },
+         fetch_messages(){
+           this.$socket.sendObj({
+                      'command': 'fetch_messages',
+                  })
          }
       }
   }

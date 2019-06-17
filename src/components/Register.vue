@@ -48,7 +48,7 @@
                   <div>
                     <span>Password</span>
                   </div>
-                  <v-text-field solo v-model="user.pwd"></v-text-field>
+                  <v-text-field solo v-model="user.password"></v-text-field>
                 </div>
                 <div>
                   <v-btn color="primary" @click="e1 = 2">Next</v-btn>
@@ -98,8 +98,9 @@
   </v-app>
 </template>
 
-<script type="text/javascript" src="../../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js"></script>
+
 <script>
+//import libsignal from 'libsignal'
 import Header from './Header'
 export default {
   name: 'Register',
@@ -120,32 +121,25 @@ export default {
       this.$router.push(menu.list)
     },
     register() {
-      var KeyHelper = libsignal.KeyHelper;
-      alert(KeyHelper)
-      let uri = "http://localhost:8000/api/register/"
+      var ALICE_ADDRESS = new window.libsignal.SignalProtocolAddress("xxxxxxxxx", 1);
+      var aliceStore = new window.SignalProtocolStore();
+      this.generateIdentity(aliceStore)
+      /*let uri = "http://localhost:8000/api/register/"
       this.axios.post(uri, this.user).then((response) => {
                  alert(response.data)
               }).catch(error => {
                 alert(error)
-            });
-       /* var registrationId = KeyHelper.generateRegistrationId();
-        // Store registrationId somewhere durable and safe.
-
-        KeyHelper.generateIdentityKeyPair().then(function(identityKeyPair) {
-            // keyPair -> { pubKey: ArrayBuffer, privKey: ArrayBuffer }
-            // Store identityKeyPair somewhere durable and safe.
-        });
-
-        KeyHelper.generatePreKey(keyId).then(function(preKey) {
-            store.storePreKey(preKey.keyId, preKey.keyPair);
-        });
-
-        KeyHelper.generateSignedPreKey(identityKeyPair, keyId).then(function(signedPreKey) {
-            store.storeSignedPreKey(signedPreKey.keyId, signedPreKey.keyPair);
-        });
-
-        // Register preKeys and signedPreKey with the server*/
+            });*/
     },
+    generateIdentity(store) {
+        return Promise.all([
+          window.libsignal.KeyHelper.generateIdentityKeyPair(),
+          window.libsignal.KeyHelper.generateRegistrationId(),
+        ]).then(function(result) {
+            store.put('identityKey', result[0]);
+            store.put('registrationId', result[1]); console.log(result)
+        });
+      },
     previewImage: function(event) {
         var input = event.target;
         if (input.files && input.files[0]) {

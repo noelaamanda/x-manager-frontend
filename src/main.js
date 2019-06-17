@@ -6,6 +6,8 @@ import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+
+
 export var eventBus = new Vue();
 
 Vue.use(VueAxios, axios);

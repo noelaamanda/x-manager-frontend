@@ -73,11 +73,16 @@ export default {
         })
       }).catch(err => {
         console.log('error : ', err)
-      })*/ this.entry.username = this.username
-      this.entry.password = this.password
+      })*/ this.entry.username = this.username 
+       this.entry.password = this.password
+      this.$store.commit('change', this.username)
       let uri = "http://localhost:8000/api/login/"
       this.axios.post(uri, this.entry).then((response) => {
-                 localStorage.setItem('token', response.data.token)
+                 this.$store.commit('LOGIN_SUCCESS', response)
+                 /*const base = {
+                   Authorization: `Token ${this.$store.state.token}`
+                 }*/
+                 this.axios.defaults.headers.common['Authorization'] = `${this.$store.state.token}`
                  this.$router.push({path: '/home'})
               }).catch(error => {
                 alert(error)

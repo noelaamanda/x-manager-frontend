@@ -1,7 +1,10 @@
 <template>
-  <v-chip color="red" text-color="white">{{ msgcontent }}
-    <br> {{ msgauthor }} <v-spacer></v-spacer> {{ msgtime }}
-  </v-chip>
+  <v-container>
+    <v-chip color="blue-darken-4" text-color="white">
+      <strong>{{ msgcontent }}</strong>
+    <br> {{ msgauthor }} <br> {{ msgtime }}
+    </v-chip>
+  </v-container> 
 </template>
 
 <script>

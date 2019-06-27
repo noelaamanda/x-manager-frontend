@@ -1,12 +1,12 @@
 <template>
-  <v-container>
-    <v-layout>
-      <v-flex :xs12="chatlist" :xs3="!chatlist"
+  <v-container fluid fill-height>
+    <v-layout fill-height="">
+      <v-flex :xs12="chatlist" :xs3="!chatlist" 
       class="chatlist" align-content-center>
-        <v-card>
+        <v-card color="blue-grey lighten-4" height="100%">
           <h1>Chats</h1> 
           <v-text-field v-model="searchchat"
-            v-if="!chatlist" prepend-icon="add" append-icon="search" clear-icon="mdi-close-circle"
+            prepend-icon="add" append-icon="search" clear-icon="mdi-close-circle"
             clearable label="Create or search chat here" type="text"
             @click:clear="clearMessage" @click:prepend="newchat = true"
           ></v-text-field>
@@ -16,8 +16,7 @@
                 <div>
                   <h3 class="headline mb-0">New Chat</h3>
                   <div>
-                    <v-autocomplete :items="contacts" filter hide-no-data no-data-text="No contacts"
-                     color="primary" item-text="username" multiple v-model="entry"
+                    <v-autocomplete v-model="entry" :items="contacts" item-text="username" multiple
                     ></v-autocomplete>
                   </div>
                 </div>
@@ -28,7 +27,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-list two-line>
+          <v-list two-line v-if="chats" background-color="blue-grey lighten-4">
             <template v-for="(item, index) in chats">
               <v-list-tile :key="index" avatar ripple @click="chatpath(item.id)">
                 <v-list-tile-content>
@@ -40,9 +39,14 @@
                   <v-icon color="cyan">star_border</v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-            <v-divider v-if="index + 1 < items.length" :key="`divider-$index`"></v-divider>
+            <v-divider v-if="index + 1 < chats.length" :key="`divider-$index`"></v-divider>
             </template>
           </v-list>
+          <div v-else style="width: 50%; margin: 0 auto">
+            <v-chip dark>
+              <strong> No Chats Yet </strong>
+            </v-chip>
+          </div>
         </v-card>
         </v-flex>
         <v-flex :xs0="chatlist" :xs9="!chatlist">
@@ -63,39 +67,7 @@ import {eventBus} from '../main';
               chatlist: true,
               newchat: false,
               entry: null,
-              contacts: {}, chats: {}, searchchat: '',
-              items: [
-                 {
-                     time: '1 min',
-                     chatname: 'Lucas',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-                 {
-                     time: '1 min',
-                     chatname: 'Lucas',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-                 {
-                     time: '1 min',
-                     chatname: 'Lucas',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-                 {
-                     time: '1 min',
-                     chatname: 'Lucas',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-                  {
-                     time: '1 min',
-                     chatname: 'Lucas',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-                  {
-                     time: '1 min',
-                     chatname: 'John',
-                     msgcontent: 'Hey, wanna hang out this weekend?'
-                 },
-             ]
+              contacts: [], chats: [], searchchat: '',
           }
       },
       methods: {
@@ -158,5 +130,8 @@ import {eventBus} from '../main';
       height: 500px;
       overflow-y: scroll;
       overscroll-behavior-y: auto;
+  }
+  .bg {
+    background-color: blue-grey lighten-3 !important;
   }
 </style>

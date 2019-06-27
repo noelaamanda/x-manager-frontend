@@ -121,9 +121,12 @@ export default {
       this.$router.push(menu.list)
     },
     register() {
-      var ALICE_ADDRESS = new window.libsignal.SignalProtocolAddress("xxxxxxxxx", 1);
-      var aliceStore = new window.SignalProtocolStore();
-      this.generateIdentity(aliceStore)
+      var user_ADDRESS = new window.libsignal.SignalProtocolAddress("xxxxxxxxx", 1);
+      var userStore = new window.SignalProtocolStore();
+      var userPreKeyId = 1337;
+      var userSignedKeyId = 1
+      this.session(userStore, user_ADDRESS, userPreKeyId, userSignedKeyId);
+      //this.session(userStore,user_ADDRESS, userPreKeyId, userSignedKeyId)
       /*let uri = "http://localhost:8000/api/register/"
       this.axios.post(uri, this.user).then((response) => {
                  alert(response.data)
@@ -131,15 +134,77 @@ export default {
                 alert(error)
             });*/
     },
-    generateIdentity(store) {
-        return Promise.all([
-          window.libsignal.KeyHelper.generateIdentityKeyPair(),
-          window.libsignal.KeyHelper.generateRegistrationId(),
-        ]).then(function(result) {
-            store.put('identityKey', result[0]);
-            store.put('registrationId', result[1]); console.log(result)
+    session(userStore, user_ADDRESS, userPreKeyId, userSignedKeyId){
+      var Alice_ADDRESS   = new window.libsignal.SignalProtocolAddress("yyyyyyyyyyyyy", 1);
+      var Curve = window.libsignal.Curve;
+      var AliceStore = new window.SignalProtocolStore();
+      Promise.all([
+        this.generateIdentity(userStore),
+        this.generateIdentity(AliceStore),
+        ]).then((result) => {
+        this.generatePreKeyBundle(userStore, userPreKeyId, userSignedKeyId)
+      .then((preKeyBundle)=> {
+        console.log(preKeyBundle)
+        var builder = new window.libsignal.SessionBuilder(AliceStore, user_ADDRESS);
+        return builder.processPreKey(preKeyBundle).then(function() {
+          console.log("LBS", window.libsignal);
+          var originalMessage = "success! it worked oh.";
+          var aliceSessionCipher = new window.libsignal.SessionCipher(AliceStore, user_ADDRESS);
+          var userSessionCipher = new window.libsignal.SessionCipher(userStore, Alice_ADDRESS);
+          aliceSessionCipher.encrypt(originalMessage).then(function(ciphertext) {
+            console.log(ciphertext)
+            console.log(typeof(ciphertext))
+            return userSessionCipher.decryptPreKeyWhisperMessage(ciphertext.body, 'binary');
+            }).then(function(plaintext) {
+            var test = String.fromCharCode.apply(null, new Uint8Array(plaintext));
+              console.log(test);
+
+            });
+            });
         });
+        });
+    },
+    generateIdentity(store) {
+      return Promise.all([
+        window.libsignal.KeyHelper.generateIdentityKeyPair(),
+        window.libsignal.KeyHelper.generateRegistrationId(),
+      ]).then(function(result) {
+        store.put('identityKey', result[0]); 
+        store.put('registrationId', result[1]);
+        // this.generatePreKeyBundle(store, preKeyId, signedPreKeyId);
+       })
       },
+    generatePreKeyBundle(store, preKeyId, signedPreKeyId) {    
+      return Promise.all([
+        store.getIdentityKeyPair(),
+        store.getLocalRegistrationId()
+      ]).then(function(result) {
+        var identity = result[0];
+        var registrationId = result[1];
+      return Promise.all([
+        window.libsignal.KeyHelper.generatePreKey(preKeyId),
+        window.libsignal.KeyHelper.generateSignedPreKey(identity, signedPreKeyId),
+      ]).then(function(keys) { console.log(keys)
+        var preKey = keys[0]
+        var signedPreKey = keys[1];
+        store.storePreKey(preKeyId, preKey.keyPair);
+        store.storeSignedPreKey(signedPreKeyId, signedPreKey.keyPair); 
+      return {
+        identityKey: identity.pubKey,
+        registrationId : registrationId,
+        preKey:  {
+            keyId     : preKeyId,
+            publicKey : preKey.keyPair.pubKey
+          },
+        signedPreKey: {
+            keyId     : signedPreKeyId,
+            publicKey : signedPreKey.keyPair.pubKey,
+            signature : signedPreKey.signature
+              }
+            };
+        });
+      });
+    },
     previewImage: function(event) {
         var input = event.target;
         if (input.files && input.files[0]) {

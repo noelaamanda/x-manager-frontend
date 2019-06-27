@@ -1,9 +1,10 @@
 <template>
   <v-container>
-    <v-chip color="blue-darken-4" text-color="white">
+    <v-button round color="blue-grey lighten-3">
+      <v-avatar color="teal"></v-avatar>
       <strong>{{ msgcontent }}</strong>
-    <br> {{ msgauthor }} <br> {{ msgtime }}
-    </v-chip>
+      <br> <br>{{ msgauthor }} <v-spacer></v-spacer> {{ msgtime }}
+    </v-button>
   </v-container> 
 </template>
 

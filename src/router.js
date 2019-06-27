@@ -6,6 +6,8 @@ import CurrentChat from './components/CurrentChat'
 import Inbox from './components/Inbox'
 import Login from './components/Login'
 import Register from './components/Register'
+import Task from './components/Task'
+import Projman from './components/Projman'
 
 Vue.use(Router)
 
@@ -41,6 +43,17 @@ export default new Router({
             },
           ]
         },
+      ]
+    },
+    {
+      path: '/projman',
+      component: Projman,
+      children: [
+        {
+          path: '/',
+          name: 'Task',
+          component: Task
+        }
       ]
     }
   ]

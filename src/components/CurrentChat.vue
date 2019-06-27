@@ -1,7 +1,18 @@
 <template>
       <v-content>
           <div ref="container"></div>
-          <v-text-field v-model="msg"></v-text-field>
+          <v-text-field prepend-icon="attach_file" v-model="msg" @click:prepend="upload = true">
+          </v-text-field>
+          <v-dialog v-model="upload">
+            <v-card lazy persistent v-model="upload" height="500px">
+              <input type="file" id="file" ref="file" v-on:change="fileupload()"/>
+              <v-card-actions>
+                <v-btn color="primary" @click="upload=false">Annuler</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" @click="submitfile()">Send</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <span>
               <v-btn icon flat @click="sending"> <v-icon>send</v-icon> </v-btn>
           </span>
@@ -17,10 +28,34 @@ import {eventBus} from '../main';
     data () {
       return {
         msg: '',
+        upload: false,
+        file: '',
         roomname: 'before'
           }
       },
     methods: {
+      fileupload(){
+        this.file = this.$refs.file.files[0]
+      },
+      submitfile(){
+        let formData = new FormData();
+        formData.append('file', this.file); 
+        formData.append('author', 1);
+        formData.append('chatdoc', 1);
+        this.axios.post('http://localhost:8000/chat/docs/',
+                formData,
+                {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+              }
+            ).then(function(data){
+              console.log(data.data);
+            })
+            .catch(function(){
+              console.log('FAILURE!!');
+            });
+      },
       sending: function() {
         this.$socket.sendObj({
             'message':this.msg,
@@ -43,7 +78,7 @@ import {eventBus} from '../main';
         this.$socket.onmessage = ({data}) => {
             var logs = JSON.parse(data);
             if (logs.command === 'messages'){
-              if (logs.messages == 'no message yet'){
+              if (logs.messages == 'No message yet'){
                 this.$refs.container.appendChild(document.createTextNode('No messages yet'))
               } else {
                 for( let i = 0; i<logs.messages.length; i++){
@@ -52,7 +87,7 @@ import {eventBus} from '../main';
                 var instance = new Msgctor({
                 propsData: {
                     msgcontent: logs.messages[i].content, 
-                    msgauthor: logs.messages[i].timestamp, 
+                    msgauthor: logs.messages[i].author, 
                     msgtime: logs.messages[i].timestamp
                     }
                 }) 

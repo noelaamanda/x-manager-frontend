@@ -1,9 +1,5 @@
 <template>
   <v-app light>
-    <Header class="header"
-      :menu-list="menuList"
-       @MenuClicked="changeMenu"
-    ></Header>
     <v-content app>
       <v-container 
        fluid class="pa-0 ma-0"
@@ -22,15 +18,14 @@
 </template>
 
 <script>
-import Header from './Header'
   export default {
-      name: 'Messaging',
+      name: 'Task',
       data () {
         return {
           menuSelected: '',
           menuList: [
-            {text:'Inbox', list:'/messaging'},
-            {text:'Notifications', list:'/chats'}
+              {text:'My Projects', list:'/projects'},
+            {text:'My Tasks', list:'/tasks'},
         ]
         }
       },
@@ -39,9 +34,6 @@ import Header from './Header'
           this.menuSelected = menu.list
           this.$router.push(menu.list)
         }
-      },
-      components: {
-          Header
       }
   }
 </script>

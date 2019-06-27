@@ -24,13 +24,13 @@
 <script>
 import Header from './Header'
   export default {
-      name: 'Messaging',
+      name: 'Projman',
       data () {
         return {
           menuSelected: '',
           menuList: [
-            {text:'Inbox', list:'/messaging'},
-            {text:'Notifications', list:'/chats'}
+              {text:'My Projects', list:'/projects'},
+            {text:'My Tasks', list:'/tasks'},
         ]
         }
       },

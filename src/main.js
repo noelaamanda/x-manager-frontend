@@ -5,6 +5,7 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import idb from './idb'
 
 
 
@@ -24,5 +25,6 @@ Vue.config.productionTip = false
 new Vue({
   router,
   store,
+  idb,
   render: h => h(App)
 }).$mount('#app')

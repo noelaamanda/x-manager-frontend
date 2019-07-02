@@ -40,6 +40,9 @@ import Header from './Header'
           this.$router.push(menu.list)
         }
       },
+      /*mounted: function(){
+        console.log(this.$userStore.getIdentityKeyPair())
+      },*/
       components: {
           Header
       }

@@ -63,8 +63,8 @@ export default {
         this.passwordType = 'password'
       }
     },
-    handleLogin () {
-      var userStore = new window.SignalProtocolStore();
+    handleLogin () { this.userStor = "login"
+      //var userStore = new window.SignalProtocolStore();
       var userPreKeyId = 1337;
       var userSignedKeyId = 1
       this.entry.username = this.username 
@@ -74,12 +74,13 @@ export default {
       let uri = "http://localhost:8000/api/login/"
       this.axios.post(uri, this.entry).then((response) => {
         var user_id = response.data.id
-        this.$store.commit('LOGIN_SUCCESS', response.data.token)
+        this.$store.commit('LOGIN_SUCCESS', user_id)
         this.axios.defaults.headers.common['Authorization'] = response.data.token
         if (response.last_login == null) {
-          this.generateIdentity(userStore).then((result)=>{
-            this.generatePreKeyBundle(userStore, userPreKeyId, userSignedKeyId)
+          this.generateIdentity(this.$userStore).then((result)=>{
+            this.generatePreKeyBundle(this.$userStore, userPreKeyId, userSignedKeyId)
             .then((preKeyBundle)=>{
+              console.log(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.identityKey)))
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.identityKey)))
               keybundle.push(preKeyBundle.preKey.keyId)
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.preKey.publicKey))) 
@@ -88,23 +89,16 @@ export default {
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.signedPreKey.publicKey)))
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.signedPreKey.signature)))
               console.log(preKeyBundle)
-              console.log(keybundle)
+              //console.log(keybundle)
               this.axios.post("http://localhost:8000/api/keystorage/", {
                 user_id :user_id, keybundle: keybundle})
                 .then((response) =>{
                 console.log(response)
                 })
-              /*var old_keystore = JSON.parse(localStorage.getItem('keystore')) ||[]
-                var new_key = {
-                  'user_id': user_id,
-                  'prekeybundle': preKeyBundle
-                } 
-                old_keystore.push(new_key)
-                localStorage.setItem('keystore', JSON.stringify(old_keystore))*/
-                  })
-                })
-              }
-        //this.$router.push({path: '/home'})
+              })
+            })
+          }
+        this.$router.push({path: '/home'})
       }).catch(error => {
         alert(error)
       });

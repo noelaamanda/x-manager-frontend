@@ -22,7 +22,7 @@
 <script>
 import Vue from 'vue'
 import Msgchip from './Msgchip.vue'
-import {eventBus} from '../main';
+import { Promise } from 'q';
   export default {
     name: 'CurrentChat',
     data () {
@@ -30,7 +30,8 @@ import {eventBus} from '../main';
         msg: '',
         upload: false,
         file: '',
-        roomname: 'before'
+        roomname: 'before',
+        receiver: ''
           }
       },
     methods: {
@@ -56,16 +57,56 @@ import {eventBus} from '../main';
               console.log('FAILURE!!');
             });
       },
+      str2ab(str) {
+      var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+      var bufView = new Uint8Array(buf);
+      for (var i=0, strLen=str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      } 
+      return buf;
+      },
       sending: function() {
         this.$socket.sendObj({
             'message':this.msg,
             'command': 'new_message',
-            'from': this.$store.getters.username,
-            'chatId': 1
+            'from': this.$store.state.username,
+            'chatId': this.$store.state.chatId
             })
           },
       },
-      mounted: function () { alert('mounted')
+      mounted: function () {  var chatId = this.$store.state.chatId
+        this.axios.get(`http://localhost:8000/chat/${chatId}`).then(response =>{
+          for (var i=0; i<2; i++){
+            if (this.$store.state.user_id != response.data.participants[i]){
+              this.receiver = response.data.participants[i]
+            } 
+          }  console.log(this.$store.state.user_id)
+          this.axios.get("http://localhost:8000/api/getkeys/", {params: {user_id: this.receiver}}).then((response)=>{
+          console.log(response.data)
+          var preKeyBundle = []
+          preKeyBundle.push({'identityKey': this.str2ab(response.data.bundle[0])})
+          var preKey = []
+          preKey.push({'keyId' : response.data.bundle[1]}),
+          preKey.push({'publicKey' : this.str2ab(response.data.bundle[2])})
+          preKeyBundle.push(preKey) 
+          preKeyBundle.push({'registrationId' :response.data.bundle[3]})
+          var signedPreKey = []
+          signedPreKey.push({'keyId' :response.data.bundle[4]})
+          signedPreKey.push({'publicKey' : this.str2ab(response.data.bundle[5])})
+          signedPreKey.push({'signature' : this.str2ab(response.data.bundle[6])})
+          preKeyBundle.push(signedPreKey)
+          console.log(preKeyBundle)
+          var Alice_ADDRESS=new window.libsignal.SignalProtocolAddress("yyyyyyyyyyyyy", 1)
+          var builder = new window.libsignal.SessionBuilder(this.$userStore, Alice_ADDRESS)
+          return builder.processPreKey(preKeyBundle).then(function() {
+            var originalMessage = "success! it worked oh."
+            var userSessionCipher = new window.libsignal.SessionCipher(this.$userStore, user_ADDRESS)
+            userSessionCipher.encrypt(originalMessage).then(function(ciphertext) {
+            console.log(ciphertext)
+              })
+          })
+        })
+      })
         this.$socket.onclose = () => {
             alert('socket closed')
             },
@@ -114,20 +155,8 @@ import {eventBus} from '../main';
                         this.$refs.container.style.textAlign = "right"
                     } else {this.$refs.container.style.textAlign = "left"}
                }
-                  } 
-         /*Vue.use(VueNativeSock, 'ws://127.0.0.1:8000' + '/ws/chat/' + this.roomname + '/', { format: 'json' }) 
-         this.$socket.onopen = () => {
-                  alert('connection successful')
-              }*/
+              } 
       },
-      /*mounted: function() {
-          //this.$refs.container.appendChild(document.createTextNode("it worked"))
-          alert (this.$store.getters.username)
-          
-      },*/
-      /*updated() {
-          alert('updated')
-      },*/
   }
 </script>
 

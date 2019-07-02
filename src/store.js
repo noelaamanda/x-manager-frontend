@@ -7,19 +7,24 @@ export default new Vuex.Store({
   state: {
   // User
      username: '',
-     token: ''
+     user_id: '',
+     chatId: ''
   },
   mutations: {
     change(state, username){
       state.username = username
     },
-    LOGIN_SUCCESS(state, response) {
-    state.token = response.token
-   }
+    LOGIN_SUCCESS(state, user_id) {
+    state.user_id = user_id
+   },
+    activechat(state, chatId){
+      state.chatId = chatId
+    }
   },
   getters: {
     username: state => state.username,
-    token: state =>state.token
+    user_id: state =>state.user_id,
+    chatId: state => state.chatId
   },
   actions: {
 

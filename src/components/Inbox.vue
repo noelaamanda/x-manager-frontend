@@ -59,7 +59,6 @@
 <script>
 import Vue from 'vue'
 import VueNativeSock from 'vue-native-websocket'
-import {eventBus} from '../main';
   export default {
       name: 'Inbox',
       data() {
@@ -81,25 +80,23 @@ import {eventBus} from '../main';
               }
             } parti.push(temp)
             temp = {}
-          }
+          } this.newchat = false
           this.axios.post('http://localhost:8000/chat/create/', {"participants":parti, "messages": []}
           ).then(response =>{
-          alert(response.data)
+          console.log(response.data)
         })
         },
-          chatpath(sender) {
-            Vue.use(VueNativeSock, 'ws://127.0.0.1:8000' + '/ws/chat/' + sender + '/', { format: 'json' }, {
-              reconnection: true,
-              reconnectionAttempts: 5,
-              reconnectionDelay: 3000,
-            })
-                this.$socket.onopen = () => { 
-                  //this.fetch_messages()
-                  alert('connection successful')
+        chatpath(sender) {
+          Vue.use(VueNativeSock, 'ws://127.0.0.1:8000' + '/ws/chat/' + sender + '/', { format: 'json' }, {
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 3000,
+          })
+          this.$socket.onopen = () => { 
+            console.log('connection successful')
               }
-             eventBus.$emit('chatname', sender)
              this.chatlist = false
-             //alert(sender)
+             this.$store.commit('activechat', sender)
              this.$router.push({ name: 'CurrentChat', params: {sender} })
          },
          clearMessage(){
@@ -111,7 +108,7 @@ import {eventBus} from '../main';
                   })
          }*/
       },
-      mounted: function(){
+      mounted: function(){ console.log(this.userStor)
         this.axios.get('http://localhost:8000/chat/', 
         {params: { username : this.$store.state.username}
         }).then((response) => {

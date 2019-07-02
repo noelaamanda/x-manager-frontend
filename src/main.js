@@ -4,12 +4,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from 'axios'
-import VueAxios from 'vue-axios'
-import idb from './idb'
+import VueAxios from 'vue-axios' 
 
 
 
-export var eventBus = new Vue();
 
 Vue.use(VueAxios, axios);
 //import libsignal from '../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js'
@@ -19,12 +17,19 @@ var csrftoken = Cookies.get('csrftoken');
 axios.defaults.headers.common['X-CSRF-TOKEN'] = csrftoken;
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";*/
-
+Vue.prototype.$userStore = new window.SignalProtocolStore();
 Vue.config.productionTip = false
+let userStor = "before"
+Vue.mixin({
+  data() {
+    return {
+      userStor
+    }
+  },
+})
 
 new Vue({
   router,
   store,
-  idb,
   render: h => h(App)
 }).$mount('#app')

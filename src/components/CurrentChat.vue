@@ -22,7 +22,8 @@
 <script>
 import Vue from 'vue'
 import Msgchip from './Msgchip.vue'
-import { Promise } from 'q';
+//import { resolve } from 'dns';
+//import { Promise } from 'q';
   export default {
     name: 'CurrentChat',
     data () {
@@ -31,7 +32,8 @@ import { Promise } from 'q';
         upload: false,
         file: '',
         roomname: 'before',
-        receiver: ''
+        receiver: '',
+        userSessionCipher: ''
           }
       },
     methods: {
@@ -65,13 +67,33 @@ import { Promise } from 'q';
       } 
       return buf;
       },
-      sending: function() {
-        this.$socket.sendObj({
-            'message':this.msg,
-            'command': 'new_message',
-            'from': this.$store.state.username,
-            'chatId': this.$store.state.chatId
+      encrypt (tstr){
+        return new Promise((resolve,reject)=>{
+          this.userSessionCipher.encrypt(tstr).then(ciphertext=> {
+          console.log(ciphertext)
+          resolve(ciphertext)
+              })
+        })
+      },
+      decrypt(ciphertext) {
+      return new Promise((resolve,reject)=>{
+        this.userSessionCipher.decryptPreKeyWhisperMessage(ciphertext.body, 'binary')
+            .then(function(plaintext) {
+            var test = String.fromCharCode.apply(null, new Uint8Array(plaintext));
+              console.log(test);
             })
+          })
+      },
+      sending: function() { 
+        this.encrypt(this.msg).then(result => { console.log(this.msg)
+          this.$socket.sendObj({
+                  'message': result,
+                  'command': 'new_message',
+                  'from': this.$store.state.username,
+                  'chatId': this.$store.state.chatId
+            })
+        })
+            console.log('test string')
           },
       },
       mounted: function () {  var chatId = this.$store.state.chatId
@@ -83,28 +105,38 @@ import { Promise } from 'q';
           }  console.log(this.$store.state.user_id)
           this.axios.get("http://localhost:8000/api/getkeys/", {params: {user_id: this.receiver}}).then((response)=>{
           console.log(response.data)
-          var preKeyBundle = []
-          preKeyBundle.push({'identityKey': this.str2ab(response.data.bundle[0])})
-          var preKey = []
-          preKey.push({'keyId' : response.data.bundle[1]}),
-          preKey.push({'publicKey' : this.str2ab(response.data.bundle[2])})
-          preKeyBundle.push(preKey) 
-          preKeyBundle.push({'registrationId' :response.data.bundle[3]})
-          var signedPreKey = []
-          signedPreKey.push({'keyId' :response.data.bundle[4]})
-          signedPreKey.push({'publicKey' : this.str2ab(response.data.bundle[5])})
-          signedPreKey.push({'signature' : this.str2ab(response.data.bundle[6])})
-          preKeyBundle.push(signedPreKey)
+          var identityKey = this.str2ab(response.data.bundle[0])
+          var preKey = {
+            'keyId' : parseInt(response.data.bundle[1]),
+            'publicKey' : this.str2ab(response.data.bundle[2])
+          }
+          var registrationId = parseInt(response.data.bundle[3])
+          var signedPreKey = {
+            'keyId' :parseInt(response.data.bundle[4]),
+            'publicKey' : this.str2ab(response.data.bundle[5]),
+            'signature' : this.str2ab(response.data.bundle[6])
+          }
+          var preKeyBundle = {
+            identityKey: identityKey,
+            preKey: preKey,
+            registrationId: registrationId,
+            signedPreKey: signedPreKey
+          }
           console.log(preKeyBundle)
+          console.log(this.$userStore)
+          var user_ADDRESS = new window.libsignal.SignalProtocolAddress("1001", 1);
           var Alice_ADDRESS=new window.libsignal.SignalProtocolAddress("yyyyyyyyyyyyy", 1)
           var builder = new window.libsignal.SessionBuilder(this.$userStore, Alice_ADDRESS)
-          return builder.processPreKey(preKeyBundle).then(function() {
+          console.log(builder)
+          builder.processPreKey(preKeyBundle)
+            console.log('reached here')
+            console.log(this.$userStore)
             var originalMessage = "success! it worked oh."
-            var userSessionCipher = new window.libsignal.SessionCipher(this.$userStore, user_ADDRESS)
-            userSessionCipher.encrypt(originalMessage).then(function(ciphertext) {
+            this.userSessionCipher = new window.libsignal.SessionCipher(this.$userStore, Alice_ADDRESS)
+            this.userSessionCipher.encrypt(originalMessage).then(function(ciphertext) {
             console.log(ciphertext)
               })
-          })
+          //})
         })
       })
         this.$socket.onclose = () => {
@@ -122,12 +154,14 @@ import { Promise } from 'q';
               if (logs.messages == 'No message yet'){
                 this.$refs.container.appendChild(document.createTextNode('No messages yet'))
               } else {
+                this.decrypt(this.msg).then(result => {
                 for( let i = 0; i<logs.messages.length; i++){
                 var sender = logs.messages[i].author
+                console.log(logs.messages[i].content)
                 const Msgctor = Vue.extend(Msgchip)
                 var instance = new Msgctor({
                 propsData: {
-                    msgcontent: logs.messages[i].content, 
+                    msgcontent: result, 
                     msgauthor: logs.messages[i].author, 
                     msgtime: logs.messages[i].timestamp
                     }
@@ -138,6 +172,7 @@ import { Promise } from 'q';
                 } else {this.$refs.container.appendChild(instance.$el).setAttribute("align", "left")
                       }
                     }
+                })
               }
                } else if (logs.command === 'new_message') {
                  sender = logs.message.author

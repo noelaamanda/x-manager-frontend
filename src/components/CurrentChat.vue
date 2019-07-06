@@ -1,21 +1,65 @@
 <template>
-      <v-content>
-          <div ref="container"></div>
-          <v-text-field prepend-icon="attach_file" v-model="msg" @click:prepend="upload = true">
-          </v-text-field>
-          <v-dialog v-model="upload">
-            <v-card lazy persistent v-model="upload" height="500px">
-              <input type="file" id="file" ref="file" v-on:change="fileupload()"/>
-              <v-card-actions>
-                <v-btn color="primary" @click="upload=false">Annuler</v-btn>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" @click="submitfile()">Send</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <span>
+      <v-content class="pa-0 wrappen">
+        <div class="contains">
+          <div class="left">
+            <div ref="container" class="display"></div>
+            <div class="send">
+              <v-text-field prepend-icon="attach_file" v-model="msg" @click:prepend="upload = true">
+            </v-text-field>
+            <span>
               <v-btn icon flat @click="sending"> <v-icon>send</v-icon> </v-btn>
-          </span>
+            </span>
+            </div>
+            <v-dialog v-model="upload">
+              <v-card lazy persistent v-model="upload" height="500px">
+                <input type="file" id="file" ref="file" v-on:change="fileupload()"/>
+                <v-card-actions>
+                  <v-btn color="primary" @click="upload=false">Annuler</v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" @click="submitfile()">Send</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+          <div class="right">
+            <v-card color="cyan darken-2" class="white-text">
+              <div class="wrapper">
+                <img src="../assets/user.png" class="user">
+              </div>
+              <input type="text" readonly value="Madina" placeholder="Username">
+              <input type="text" readonly value="madina@ashdownx.com" placeholder="Email">
+            </v-card>
+            <v-card>
+              <v-list-group
+               v-for="item in items"
+               :key="item.title"
+               v-model="item.active"
+               :prepend-icon="item.action"
+               no-action=""
+              >
+                <template v-slot:activator>
+                  <v-list-tile>
+                    <v-list-tile-content>
+                      <v-list-tile-title> {{item.title}} </v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </template>
+                <v-list-tile
+                 v-for="subitem in item.items"
+                 :key="subitem.title"
+                 @click=""
+                >
+                  <v-list-tile-content>
+                    <v-list-tile-title> {{subitem.title}} </v-list-tile-title>
+                  </v-list-tile-content>
+                  <v-list-tile-action>
+                    <v-icon> {{subitem.action}} </v-icon>
+                  </v-list-tile-action>
+                </v-list-tile>
+              </v-list-group>
+            </v-card>
+          </div>
+        </div>
       </v-content>
 </template>
 
@@ -34,7 +78,25 @@ import Msgchip from './Msgchip.vue'
         roomname: 'before',
         receiver: '',
         userSessionCipher: '',
-        cryptr : new Window.Cryptr('bluffkey')
+        cryptr : new Window.Cryptr('bluffkey'),
+        items: [
+          {
+            action: 'local_activity',
+            title: 'Documents',
+            items: [
+              {title: 'you name it'},
+              {title: 'you name it'}
+            ]
+          },
+          {
+            action: 'restaurant',
+            title: 'Projects',
+            items: [
+              {title: 'you name it'},
+              {title: 'you name it'}
+            ]
+          }
+        ]
           }
       },
     methods: {
@@ -170,4 +232,40 @@ import Msgchip from './Msgchip.vue'
 </script>
 
 <style scoped>
+ .contains {
+   display: flex;
+   height: 100% !important;
+ }
+ .left {
+   flex: 0 0 65%;
+   overflow-y: scroll;
+   position: relative;
+ }
+ .display {
+   overflow-y: scroll;
+ }
+ .send {
+   bottom: 0;
+   position: absolute;
+   width: 100%;
+ }
+ .right {
+   flex: 1;
+ }
+ .wrapper {
+   overflow: hidden;
+ }
+ .user {
+   max-width: 100%;
+ }
+ .tfield {
+   color: cyan darken-2 !important;
+ }
+ input[type=text] {
+   background-color: rgb(16, 122, 122);
+   color: white;
+ }
+ .wrappen {
+   height: 100% !important;
+ }
 </style>

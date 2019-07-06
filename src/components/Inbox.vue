@@ -1,9 +1,9 @@
 <template>
   <v-container fluid fill-height>
-    <v-layout fill-height="">
+    <v-layout fill-height>
       <v-flex :xs12="chatlist" :xs3="!chatlist" 
       class="chatlist" align-content-center>
-        <v-card color="blue-grey lighten-4" height="100%">
+        <v-card color="cyan darken-2" height="100%" class="white--text">
           <h1>Chats</h1> 
           <v-text-field v-model="searchchat"
             prepend-icon="add" append-icon="search" clear-icon="mdi-close-circle"
@@ -124,7 +124,7 @@ import VueNativeSock from 'vue-native-websocket'
 
 <style scoped>
    .chatlist {
-      height: 500px;
+      height: 100%;
       overflow-y: scroll;
       overscroll-behavior-y: auto;
   }

@@ -10,6 +10,7 @@
   "dependencies": {
     "bytebuffer": "^5.0.1",
     "core-js": "^2.6.5",
+    "cryptr": "^4.0.2",
     "file-encryptor": "^0.1.1",
     "idb": "^4.0.3",
     "jwt-decode": "^2.2.0",

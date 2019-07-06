@@ -10,6 +10,8 @@ import VueAxios from 'vue-axios'
 
 
 Vue.use(VueAxios, axios);
+Window.encryptor = require('file-encryptor')
+Window.Cryptr = require('cryptr')
 //import libsignal from '../node_modules/libsignal-protocol-javascript/dist/libsignal-protocol.js'
 //window.Cookies = require('js-cookie');
 /*import Cookies from 'js-cookie'
@@ -19,14 +21,6 @@ axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";*/
 Vue.prototype.$userStore = new window.SignalProtocolStore();
 Vue.config.productionTip = false
-let userStor = "before"
-Vue.mixin({
-  data() {
-    return {
-      userStor
-    }
-  },
-})
 
 new Vue({
   router,

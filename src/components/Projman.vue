@@ -29,8 +29,8 @@ import Header from './Header'
         return {
           menuSelected: '',
           menuList: [
-              {text:'My Projects', list:'/projects'},
-            {text:'My Tasks', list:'/tasks'},
+            {text:'My Tasks', list:'/projects'},
+            {text:'My Projects', list:'/tasks'},
         ]
         }
       },

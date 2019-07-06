@@ -33,7 +33,8 @@ import Msgchip from './Msgchip.vue'
         file: '',
         roomname: 'before',
         receiver: '',
-        userSessionCipher: ''
+        userSessionCipher: '',
+        cryptr : new Window.Cryptr('bluffkey')
           }
       },
     methods: {
@@ -41,6 +42,7 @@ import Msgchip from './Msgchip.vue'
         this.file = this.$refs.file.files[0]
       },
       submitfile(){
+        this.upload = false
         let formData = new FormData();
         formData.append('file', this.file); 
         formData.append('author', 1);
@@ -67,42 +69,25 @@ import Msgchip from './Msgchip.vue'
       } 
       return buf;
       },
-      encrypt (tstr){
-        return new Promise((resolve,reject)=>{
-          this.userSessionCipher.encrypt(tstr).then(ciphertext=> {
-          console.log(ciphertext)
-          resolve(ciphertext)
-              })
-        })
-      },
-      decrypt(ciphertext) {
-      return new Promise((resolve,reject)=>{
-        this.userSessionCipher.decryptPreKeyWhisperMessage(ciphertext.body, 'binary')
-            .then(function(plaintext) {
-            var test = String.fromCharCode.apply(null, new Uint8Array(plaintext));
-              console.log(test);
-            })
-          })
-      },
       sending: function() { 
-        this.encrypt(this.msg).then(result => { console.log(this.msg)
-          this.$socket.sendObj({
-                  'message': result,
+        //var cryptr = new Window.Cryptr('bluffkey')
+        var cipher = this.cryptr.encrypt(this.msg)
+        console.log(cipher)
+         this.$socket.sendObj({
+                  'message': cipher,
                   'command': 'new_message',
                   'from': this.$store.state.username,
                   'chatId': this.$store.state.chatId
             })
-        })
-            console.log('test string')
-          },
       },
+    },
       mounted: function () {  var chatId = this.$store.state.chatId
         this.axios.get(`http://localhost:8000/chat/${chatId}`).then(response =>{
           for (var i=0; i<2; i++){
             if (this.$store.state.user_id != response.data.participants[i]){
               this.receiver = response.data.participants[i]
             } 
-          }  console.log(this.$store.state.user_id)
+          } 
           this.axios.get("http://localhost:8000/api/getkeys/", {params: {user_id: this.receiver}}).then((response)=>{
           console.log(response.data)
           var identityKey = this.str2ab(response.data.bundle[0])
@@ -123,20 +108,6 @@ import Msgchip from './Msgchip.vue'
             signedPreKey: signedPreKey
           }
           console.log(preKeyBundle)
-          console.log(this.$userStore)
-          var user_ADDRESS = new window.libsignal.SignalProtocolAddress("1001", 1);
-          var Alice_ADDRESS=new window.libsignal.SignalProtocolAddress("yyyyyyyyyyyyy", 1)
-          var builder = new window.libsignal.SessionBuilder(this.$userStore, Alice_ADDRESS)
-          console.log(builder)
-          builder.processPreKey(preKeyBundle)
-            console.log('reached here')
-            console.log(this.$userStore)
-            var originalMessage = "success! it worked oh."
-            this.userSessionCipher = new window.libsignal.SessionCipher(this.$userStore, Alice_ADDRESS)
-            this.userSessionCipher.encrypt(originalMessage).then(function(ciphertext) {
-            console.log(ciphertext)
-              })
-          //})
         })
       })
         this.$socket.onclose = () => {
@@ -154,14 +125,15 @@ import Msgchip from './Msgchip.vue'
               if (logs.messages == 'No message yet'){
                 this.$refs.container.appendChild(document.createTextNode('No messages yet'))
               } else {
-                this.decrypt(this.msg).then(result => {
                 for( let i = 0; i<logs.messages.length; i++){
                 var sender = logs.messages[i].author
-                console.log(logs.messages[i].content)
+                var cryptr = new Window.Cryptr('bluffkey')
+                var decipher = cryptr.decrypt(logs.messages[i].content)
+                console.log(decipher)
                 const Msgctor = Vue.extend(Msgchip)
                 var instance = new Msgctor({
                 propsData: {
-                    msgcontent: result, 
+                    msgcontent: decipher, 
                     msgauthor: logs.messages[i].author, 
                     msgtime: logs.messages[i].timestamp
                     }
@@ -172,14 +144,16 @@ import Msgchip from './Msgchip.vue'
                 } else {this.$refs.container.appendChild(instance.$el).setAttribute("align", "left")
                       }
                     }
-                })
               }
                } else if (logs.command === 'new_message') {
                  sender = logs.message.author
+                 //var cryptr = new Window.Cryptr('bluffkey')
+                 var newdecipher = this.cryptr.decrypt(logs.message.content)
+                 console.log(newdecipher)
                    const Msgctor = Vue.extend(Msgchip)
                     instance = new Msgctor({
                     propsData: {
-                        msgcontent: logs.message.content, 
+                        msgcontent: newdecipher, 
                         msgauthor: logs.message.author, 
                         msgtime: logs.message.timestamp
                         }

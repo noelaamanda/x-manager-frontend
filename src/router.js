@@ -46,7 +46,7 @@ export default new Router({
       ]
     },
     {
-      path: '/projman',
+      path: '/projects',
       component: Projman,
       children: [
         {

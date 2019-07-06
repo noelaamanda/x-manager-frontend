@@ -1,20 +1,34 @@
 <template>
-  <v-app light>
-    <v-content app>
-      <v-container 
-       fluid class="pa-0 ma-0"
-       wrap
-       fill-height
-      >
-        <v-layout column>
-          <v-flex xs12 shrink>see</v-flex>
-          <v-flex xs12 grow>
-            <router-view transition="fade-transition"></router-view>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
-  </v-app>
+  <v-container fluid fill-height>
+    <v-card>
+      <v-list>
+        <template v-for="(item, index) in items">
+          <v-list-tile 
+           :key="item.title" avatar ripple @click="toggle(index)"
+          >
+            <v-list-tile-content>
+              <v-list-tile-title> {{item.title}} </v-list-tile-title>
+            </v-list-tile-content>
+            <v-list-tile-action>
+              <v-icon
+                v-if="selected.indexOf(index) < 0"
+                color="grey lighten-1"
+              >
+                star_border
+              </v-icon>
+              <v-icon v-else color="yellow darken-2">
+                star
+              </v-icon>
+            </v-list-tile-action>
+          </v-list-tile>
+          <v-divider
+            v-if="index + 1 < items.length"
+            :key="index"
+          ></v-divider>
+        </template>
+      </v-list>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -22,17 +36,23 @@
       name: 'Task',
       data () {
         return {
-          menuSelected: '',
-          menuList: [
-              {text:'My Projects', list:'/projects'},
-            {text:'My Tasks', list:'/tasks'},
-        ]
+          selected:[2],
+          items: [
+            {title : 'Soutenance'},
+            {title : 'Soutenance'},
+            {title : 'Soutenance'},
+            {title : 'Soutenance'}
+          ]
         }
       },
       methods: {
-        changeMenu (menu) {
-          this.menuSelected = menu.list
-          this.$router.push(menu.list)
+        toggle (index) {
+          const i = this.selected.indexOf(index)
+          if (i > -1) {
+            this.selected.splice(i, 1)
+          } else {
+            this.selected.push(index)
+          }
         }
       }
   }

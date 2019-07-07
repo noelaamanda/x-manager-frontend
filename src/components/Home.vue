@@ -27,53 +27,19 @@
             <div class="horizontal">
               <router-link top to="/messaging">
                 <v-btn primary large class="agenda"
-                  v-on:mouseover="showCustomTooltip('Agenda')" @mouseleave="tooltipShow = false"
+                  v-on:mouseover="showCustomTooltip('Messages')" @mouseleave="tooltipShow = false"
                 >
-                  <v-icon large dark>event</v-icon>
+                  <v-icon large dark>chat</v-icon>
                 </v-btn> <br>
                 <span class="white--text">Messaging</span>
               </router-link>
-              <router-link top to="/messaging">
+              <router-link top to="/projects">
                 <v-btn primary large class="tasks"
                   v-on:mouseover="showCustomTooltip('My Tasks')" @mouseleave="tooltipShow = false"
                 >
-                  <v-icon large light>school</v-icon>
+                  <v-icon large light>bug_report</v-icon>
                 </v-btn> <br>
                 <span class="white--text">My Tasks</span>
-              </router-link>
-              <router-link top to="/messaging">
-                <v-btn primary class="audit" large
-                  v-on:mouseover="showCustomTooltip('Audit')" @mouseleave="tooltipShow = false"
-                >
-                  <v-icon large light>group</v-icon>
-                </v-btn> <br>
-                <span class="white--text">Audit</span>
-              </router-link>
-            </div>
-            <div class="horizontal">
-              <router-link top to="/messaging">
-                <v-btn primary large class="accounting"
-                  v-on:mouseover="showCustomTooltip('Accounting')" @mouseleave="tooltipShow = false"
-                >
-                  <v-icon large light>forum</v-icon>
-                </v-btn> <br>
-                <span class="white--text">Messaging</span>
-              </router-link>
-              <router-link top to="/messaging">
-                <v-btn primary class="agenda" large
-                  v-on:mouseover="showCustomTooltip('Messaging')" @mouseleave="tooltipShow = false"
-                >
-                  <v-icon large light>group</v-icon>
-                </v-btn> <br>
-                <span class="white--text">Messaging</span>
-              </router-link>
-              <router-link top to="/messaging">
-                <v-btn primary class="audit" large
-                  v-on:mouseover="showCustomTooltip('Audit')" @mouseleave="tooltipShow = false"
-                >
-                  <v-icon large light>school</v-icon>
-                </v-btn> <br>
-                <span class="white--text">Audit</span>
               </router-link>
             </div>
               <v-tooltip

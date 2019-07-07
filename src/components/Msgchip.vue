@@ -1,10 +1,17 @@
 <template>
   <v-container>
-    <v-button round color="blue-grey lighten-3">
-      <v-avatar color="teal"></v-avatar>
-      <strong>{{ msgcontent }}</strong>
-      <br> <br>{{ msgauthor }} <v-spacer></v-spacer> {{ msgtime }}
-    </v-button>
+    <div>
+      <v-chip color="white">
+        <v-avatar>
+          <img src="../assets/user.png">
+        </v-avatar>
+        {{ msgauthor }}
+      </v-chip>
+      <div style="background-color: cyan darken-2">
+        <strong>{{ msgcontent }}</strong>
+      </div>
+      <br>{{ msgtime }}
+    </div>
   </v-container> 
 </template>
 
@@ -19,3 +26,10 @@
       props: ['msgcontent', 'msgauthor', 'msgtime']
   }
 </script>
+<style scoped>
+ div {
+   border-radius: 25px !important;
+   text-align: left;
+   color: steelblue;
+ }
+</style>

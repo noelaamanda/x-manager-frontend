@@ -3,7 +3,7 @@
     <v-layout fill-height>
       <v-flex :xs12="chatlist" :xs3="!chatlist" 
       class="chatlist" align-content-center>
-        <v-card color="cyan darken-2" height="100%" class="white--text">
+        <v-card height="100%">
           <h1>Chats</h1> 
           <v-text-field v-model="searchchat"
             prepend-icon="add" append-icon="search" clear-icon="mdi-close-circle"
@@ -27,7 +27,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-list two-line v-if="chats" background-color="blue-grey lighten-4">
+          <v-list two-line v-if="chats" class="listing">
             <template v-for="(item, index) in chats">
               <v-list-tile :key="index" avatar ripple @click="chatpath(item.id)">
                 <v-list-tile-content>
@@ -84,6 +84,12 @@ import VueNativeSock from 'vue-native-websocket'
           this.axios.post('http://localhost:8000/chat/create/', {"participants":parti, "messages": []}
           ).then(response =>{
           console.log(response.data)
+          alert('chat successfully created')
+        })
+        this.axios.get('http://localhost:8000/chat/', 
+        {params: { username : this.$store.state.username}
+        }).then((response) => {
+          this.chats = response.data
         })
         },
         chatpath(sender) {
@@ -94,6 +100,7 @@ import VueNativeSock from 'vue-native-websocket'
           })
           this.$socket.onopen = () => { 
             console.log('connection successful')
+            console.log('here')
               }
              this.chatlist = false
              this.$store.commit('activechat', sender)
@@ -108,7 +115,7 @@ import VueNativeSock from 'vue-native-websocket'
                   })
          }*/
       },
-      mounted: function(){ console.log(this.userStor)
+      mounted: function(){ 
         this.axios.get('http://localhost:8000/chat/', 
         {params: { username : this.$store.state.username}
         }).then((response) => {
@@ -128,7 +135,7 @@ import VueNativeSock from 'vue-native-websocket'
       overflow-y: scroll;
       overscroll-behavior-y: auto;
   }
-  .bg {
-    background-color: blue-grey lighten-3 !important;
+  .listing {
+    background-color:aquamarine;
   }
 </style>

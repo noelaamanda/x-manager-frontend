@@ -8,7 +8,7 @@
         <div class="login-form">
           <div class="email">
             <div>
-              <span>Email</span>
+              <span>Username</span>
             </div>
             <v-text-field class="email_input" solo name="email" v-model="username"></v-text-field>
           </div>
@@ -80,7 +80,7 @@ export default {
           this.generateIdentity(this.$userStore).then((result)=>{
             this.generatePreKeyBundle(this.$userStore, userPreKeyId, userSignedKeyId)
             .then((preKeyBundle)=>{
-              console.log(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.identityKey)))
+              //console.log(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.identityKey)))
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.identityKey)))
               keybundle.push(preKeyBundle.preKey.keyId)
               keybundle.push(String.fromCharCode.apply(null, new Uint8Array(preKeyBundle.preKey.publicKey))) 
@@ -110,6 +110,8 @@ export default {
       ]).then(function(result) {
         store.put('identityKey', result[0]); 
         store.put('registrationId', result[1])
+        console.log(result[0])
+        console.log(result[1])
        })
       },
     generatePreKeyBundle(store, preKeyId, signedPreKeyId) {    
@@ -148,7 +150,7 @@ export default {
       var bufView = new Uint8Array(buf);
       for (var i=0, strLen=str.length; i < strLen; i++) {
         bufView[i] = str.charCodeAt(i);
-      } console.log(buf)
+      } 
       return buf;
     }
   },

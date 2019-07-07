@@ -35,7 +35,7 @@
               <v-avatar class="userimg">
                 <img src="../assets/user.png" alt="user">
               </v-avatar>
-              <span class="username">Ashdown X..</span>
+              <span class="username">{{this.$store.state.username}}</span>
             </v-btn>
             <v-list>
               <v-list-tile @click="profile">

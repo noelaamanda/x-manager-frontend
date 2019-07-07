@@ -22,41 +22,55 @@
             </v-dialog>
           </div>
           <div class="right">
-            <v-card color="cyan darken-2" class="white-text">
-              <div class="wrapper">
-                <img src="../assets/user.png" class="user">
-              </div>
-              <input type="text" readonly value="Madina" placeholder="Username">
-              <input type="text" readonly value="madina@ashdownx.com" placeholder="Email">
-            </v-card>
             <v-card>
-              <v-list-group
-               v-for="item in items"
-               :key="item.title"
-               v-model="item.active"
-               :prepend-icon="item.action"
-               no-action=""
-              >
-                <template v-slot:activator>
-                  <v-list-tile>
-                    <v-list-tile-content>
-                      <v-list-tile-title> {{item.title}} </v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </template>
-                <v-list-tile
-                 v-for="subitem in item.items"
-                 :key="subitem.title"
-                 @click=""
-                >
-                  <v-list-tile-content>
-                    <v-list-tile-title> {{subitem.title}} </v-list-tile-title>
-                  </v-list-tile-content>
-                  <v-list-tile-action>
-                    <v-icon> {{subitem.action}} </v-icon>
-                  </v-list-tile-action>
-                </v-list-tile>
-              </v-list-group>
+              <v-container fluid grid-list-lg>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-card>
+                      <div class="wrapper">
+                        <img src="../assets/user.png" class="user">
+                      </div>
+                      <div>
+                        <input type="text" readonly value="Madina" placeholder="Username">
+                        <input type="text" readonly value="madina@ashdownx.com" placeholder="Email">
+                      </div>
+                    </v-card>
+                  </v-flex>
+                  <v-flex xs12>
+                    <v-card>
+                      <v-list>
+                        <v-list-group
+                       v-for="item in items"
+                       :key="item.title"
+                       v-model="item.active"
+                       :prepend-icon="item.action"
+                       no-action=""
+                      >
+                        <template v-slot:activator>
+                          <v-list-tile>
+                            <v-list-tile-content>
+                              <v-list-tile-title> {{item.title}} </v-list-tile-title>
+                            </v-list-tile-content>
+                          </v-list-tile>
+                        </template>
+                        <v-list-tile
+                         v-for="subitem in item.items"
+                         :key="subitem.title"
+                         @click=""
+                        >
+                          <v-list-tile-content>
+                            <v-list-tile-title> {{subitem.title}} </v-list-tile-title>
+                          </v-list-tile-content>
+                          <v-list-tile-action>
+                            <v-icon> {{subitem.action}} </v-icon>
+                          </v-list-tile-action>
+                        </v-list-tile>
+                      </v-list-group>
+                      </v-list>
+                    </v-card>
+                  </v-flex>
+                </v-layout>
+              </v-container>
             </v-card>
           </div>
         </div>
@@ -81,19 +95,19 @@ import Msgchip from './Msgchip.vue'
         cryptr : new Window.Cryptr('bluffkey'),
         items: [
           {
-            action: 'local_activity',
+            action: 'description',
             title: 'Documents',
             items: [
-              {title: 'you name it'},
-              {title: 'you name it'}
+              {title: 'ashdownx.pdf'},
+              {title: 'memoire.pdf'}
             ]
           },
           {
-            action: 'restaurant',
+            action: 'assignment',
             title: 'Projects',
             items: [
-              {title: 'you name it'},
-              {title: 'you name it'}
+              {title: 'sprint 1'},
+              {title: 'sprint 2'}
             ]
           }
         ]
@@ -242,6 +256,7 @@ import Msgchip from './Msgchip.vue'
    position: relative;
  }
  .display {
+   height: 80%;
    overflow-y: scroll;
  }
  .send {
@@ -253,7 +268,8 @@ import Msgchip from './Msgchip.vue'
    flex: 1;
  }
  .wrapper {
-   overflow: hidden;
+   overflow: hidden !important;
+   height: 250px;
  }
  .user {
    max-width: 100%;
@@ -262,10 +278,15 @@ import Msgchip from './Msgchip.vue'
    color: cyan darken-2 !important;
  }
  input[type=text] {
-   background-color: rgb(16, 122, 122);
-   color: white;
+   background-color:white;
+   color: black;
  }
  .wrappen {
    height: 100% !important;
+ }
+ img {
+   max-height:100%;
+   max-width: 100%;
+   object-fit: contain;
  }
 </style>

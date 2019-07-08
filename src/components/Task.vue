@@ -1,6 +1,45 @@
 <template>
   <v-container fluid fill-height>
-    <v-card>
+    <v-card height="100%" class="carddisp">
+      <div>
+        <v-btn color="teal" @click ="newtask=true">Add Task</v-btn>
+      </div>
+      <v-dialog v-model="newtask" lazy persistent width="400px">
+        <v-card>
+          <v-card-title primary-title>
+            <div>
+              <h3 class="headline mb-0">New Task</h3>
+                  <div>
+                    <v-text-field label="Name" v-model="entry.name"></v-text-field>
+                    <v-autocomplete v-model="members" :items="contacts" item-text="username" multiple
+                    ></v-autocomplete>
+                    <v-dialog
+                     ref="dialog"
+                     v-model="modal" persistent lazy full-width 
+                     :return-value.sync="date"
+                    >
+                      <template v-slot:activator="{on}"
+                      >
+                        <v-text-field v-model="date" label="start Date" readonly
+                        prepend-icon="event" v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker v-model="date" scrollable color="teal">
+                        <v-spacer></v-spacer>
+                        <v-btn color="teal" flat @click="modal=false">Cancel</v-btn>
+                        <v-btn color="teal" flat @click="$refs.dialog.save(date)">OK</v-btn>
+                      </v-date-picker>
+                    </v-dialog>
+                    <v-text-field label="Estimated time" v-model="entry.time"></v-text-field>
+                  </div>
+                </div>
+              </v-card-title>
+              <v-card-actions>
+                <v-btn flat color="blue" @click.stop="newtask=false">Cancel</v-btn> <v-spacer></v-spacer>
+                <v-btn flat color="blue" @click="save">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
       <v-list>
         <template v-for="(item, index) in items">
           <v-list-tile 
@@ -42,7 +81,13 @@
             {title : 'Soutenance'},
             {title : 'Soutenance'},
             {title : 'Soutenance'}
-          ]
+          ], 
+          newtask: false,
+          entry: {},
+          modal: false,
+          members: null,
+          date: new Date().toISOString().substr(0, 10),
+          contacts: []
         }
       },
       methods: {
@@ -53,11 +98,25 @@
           } else {
             this.selected.push(index)
           }
+        },
+        save() {
+          this.newtask = false
+          alert('task created')
         }
+      },
+      mounted: function() {
+        this.axios.get('http://localhost:8000/chat/users/').then(response =>{
+          this.contacts = response.data
+        })
       }
   }
 </script>
 
 <style scoped>
-  
+ .carddisp {
+    width: 100%;
+  }  
+  .listing {
+    background-color:rgb(206, 212, 218);
+  }
 </style>

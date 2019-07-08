@@ -26,7 +26,10 @@
               <v-container fluid grid-list-lg>
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-card>
+                    <v-card v-if="isGroup">
+                      <div></div>
+                    </v-card>
+                    <v-card v-else>
                       <div class="wrapper">
                         <img src="../assets/user.png" class="user">
                       </div>
@@ -56,7 +59,7 @@
                         <v-list-tile
                          v-for="subitem in item.items"
                          :key="subitem.title"
-                         @click=""
+                         @click="console.log(clicked)"
                         >
                           <v-list-tile-content>
                             <v-list-tile-title> {{subitem.title}} </v-list-tile-title>
@@ -80,13 +83,13 @@
 <script>
 import Vue from 'vue'
 import Msgchip from './Msgchip.vue'
-//import { resolve } from 'dns';
-//import { Promise } from 'q';
   export default {
     name: 'CurrentChat',
     data () {
       return {
         msg: '',
+        members: {},
+        isGroup : false,
         upload: false,
         file: '',
         roomname: 'before',
@@ -110,7 +113,7 @@ import Msgchip from './Msgchip.vue'
               {title: 'sprint 2'}
             ]
           }
-        ]
+        ], 
           }
       },
     methods: {
@@ -159,11 +162,12 @@ import Msgchip from './Msgchip.vue'
     },
       mounted: function () {  var chatId = this.$store.state.chatId
         this.axios.get(`http://localhost:8000/chat/${chatId}`).then(response =>{
+          this.members = response.data.participants
           for (var i=0; i<2; i++){
             if (this.$store.state.user_id != response.data.participants[i]){
               this.receiver = response.data.participants[i]
             } 
-          } 
+          } if(response.data.name != '') {this.isGroup = true}
           this.axios.get("http://localhost:8000/api/getkeys/", {params: {user_id: this.receiver}}).then((response)=>{
           console.log(response.data)
           var identityKey = this.str2ab(response.data.bundle[0])
@@ -192,7 +196,7 @@ import Msgchip from './Msgchip.vue'
         this.$socket.onopen = () => {
             this.$socket.sendObj({
                 'command': 'fetch_messages',
-                'chatId': 1
+                'chatId': this.$store.state.chatId
             })
         }
         this.$socket.onmessage = ({data}) => {
@@ -205,7 +209,7 @@ import Msgchip from './Msgchip.vue'
                 var sender = logs.messages[i].author
                 var cryptr = new Window.Cryptr('bluffkey')
                 var decipher = cryptr.decrypt(logs.messages[i].content)
-                console.log(decipher)
+                console.log(logs.messages[i].content)
                 const Msgctor = Vue.extend(Msgchip)
                 var instance = new Msgctor({
                 propsData: {

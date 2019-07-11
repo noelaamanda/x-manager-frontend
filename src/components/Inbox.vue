@@ -101,7 +101,8 @@ import VueNativeSock from 'vue-native-websocket'
         this.axios.get('http://localhost:8000/chat/', 
         {params: { username : this.$store.state.username}
         }).then((response) => {
-          this.chats = response.data
+          this.chats = {}
+          this.chats.push(response.data)
         })
         },
         chatpath(sender) {

@@ -27,7 +27,34 @@
                 <v-layout row wrap>
                   <v-flex xs12>
                     <v-card v-if="isGroup">
-                      <div></div>
+                      <div>
+                        <v-avatar size="200">
+                          <v-icon x-large>people</v-icon>
+                        </v-avatar>
+                      </div>
+                      <div>
+                        <v-btn flat color="teal">Add Participant</v-btn>
+                        <v-btn flat color="teal">Remove Participant</v-btn>
+                        <v-list>
+                          <v-list-group>
+                            <template v-slot:activator>
+                              <v-list-tile>
+                                <v-list-tile-content>
+                                  <v-list-tile-title> {{item.title}} </v-list-tile-title>
+                                </v-list-tile-content>
+                              </v-list-tile>
+                            </template>
+                        <v-list-tile
+                         v-for="subitem in members"
+                         :key="subitem.title"
+                        >
+                          <v-list-tile-content>
+                            <v-list-tile-title> {{subitem.username}} </v-list-tile-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                      </v-list-group>
+                      </v-list>
+                      </div>
                     </v-card>
                     <v-card v-else>
                       <div class="wrapper">
@@ -59,7 +86,7 @@
                         <v-list-tile
                          v-for="subitem in item.items"
                          :key="subitem.title"
-                         @click="console.log(clicked)"
+                         @click="taskpath"
                         >
                           <v-list-tile-content>
                             <v-list-tile-title> {{subitem.title}} </v-list-tile-title>
@@ -87,8 +114,9 @@ import Msgchip from './Msgchip.vue'
     name: 'CurrentChat',
     data () {
       return {
-        msg: '',
-        members: {},
+        msg: '', tasks: [],
+        contacts: [],
+        members: [],
         isGroup : false,
         upload: false,
         file: '',
@@ -121,11 +149,28 @@ import Msgchip from './Msgchip.vue'
         this.file = this.$refs.file.files[0]
       },
       submitfile(){
+        /*var encryptor = require('file-encryptor');
+        var key = 'My Super Secret Key'; 
+        console.log(this.file)
+        encryptor.encryptFile('../assets/Docs/debug.txt', 'encrypted.dat', key, function(err) {
+});*/   /*var fcrypt = require('fcrypt');
+        fcrypt.encrypt({
+        key: "mySuperPass1337",
+        input: "../assets/Docs/debug.txt",
+        output: "../assets/Docs/private.data",
+        callback: (errors) => {
+          if (errors.exists) {
+            errors.console();
+            return;
+          }
+          console.log("encrypted");
+        }
+        });*/
         this.upload = false
         let formData = new FormData();
         formData.append('file', this.file); 
-        formData.append('author', 1);
-        formData.append('chatdoc', 1);
+        formData.append('author', this.$store.state.user_id);
+        formData.append('chatdoc', this.$store.state.chatId);
         this.axios.post('http://localhost:8000/chat/docs/',
                 formData,
                 {
@@ -159,15 +204,39 @@ import Msgchip from './Msgchip.vue'
                   'chatId': this.$store.state.chatId
             })
       },
+      taskpath(){
+        this.$router.push('/projects')
+      }
     },
       mounted: function () {  var chatId = this.$store.state.chatId
-        this.axios.get(`http://localhost:8000/chat/${chatId}`).then(response =>{
-          this.members = response.data.participants
-          for (var i=0; i<2; i++){
-            if (this.$store.state.user_id != response.data.participants[i]){
-              this.receiver = response.data.participants[i]
+      this.axios.get('http://localhost:8000/chat/users/').then(response =>{
+          //this.contacts = response.data
+          for (var a=0; a<response.data.length; a++){
+            if (this.$store.state.user_id != response.data[a].id){
+              this.contacts.push(response.data[a])
             } 
-          } if(response.data.name != '') {this.isGroup = true}
+          }
+        })
+        this.axios.get('http://localhost:8000/task/').then(response =>{
+          this.tasks = response.data
+          this.items[1].items.push(response.data)
+        })
+        this.axios.get(`http://localhost:8000/chat/${chatId}`).then(response =>{
+          var c = response.data.participants
+          var temp = {}
+          for (var i=0; i< c.length; i++){
+            for (var j=0; j< this.contacts.length; j++){
+              if (this.contacts[j].id == c[i]){
+                temp = this.contacts[j].username
+              }
+            } this.members.push(temp)
+            temp = {}
+          }  
+          for (var b=0; b<2; b++){
+            if (this.$store.state.user_id != response.data.participants[b]){
+              this.receiver = response.data.participants[b]
+            } 
+          } this.isGroup = response.data.isGroup
           this.axios.get("http://localhost:8000/api/getkeys/", {params: {user_id: this.receiver}}).then((response)=>{
           console.log(response.data)
           var identityKey = this.str2ab(response.data.bundle[0])
@@ -193,12 +262,16 @@ import Msgchip from './Msgchip.vue'
         this.$socket.onclose = () => {
             alert('socket closed')
             },
-        this.$socket.onopen = () => {
+         this.$socket.sendObj({
+                'command': 'fetch_messages',
+                'chatId': this.$store.state.chatId
+            })
+        /*this.$socket.onopen = () => {
             this.$socket.sendObj({
                 'command': 'fetch_messages',
                 'chatId': this.$store.state.chatId
             })
-        }
+        }*/
         this.$socket.onmessage = ({data}) => {
             var logs = JSON.parse(data);
             if (logs.command === 'messages'){

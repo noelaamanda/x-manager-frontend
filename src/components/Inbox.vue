@@ -90,6 +90,9 @@ import VueNativeSock from 'vue-native-websocket'
             temp = {}
           } this.newchat = false
           parti.push(this.$store.state.user_id)
+          if (this.isGroup == false){
+            this.chatname = this.entry + this.$store.state.username
+          }
           if (parti.length > 1) {
             this.axios.post('http://localhost:8000/chat/create/', 
             {"participants":parti,"isGroup": this.isGroup, "name": this.chatname}
@@ -101,8 +104,13 @@ import VueNativeSock from 'vue-native-websocket'
         this.axios.get('http://localhost:8000/chat/', 
         {params: { username : this.$store.state.username}
         }).then((response) => {
-          this.chats = {}
-          this.chats.push(response.data)
+          this.chats = []
+          console.log('seen')
+          for (var i = 0; i< response.data.length; i++){
+            if (response.data[i].isGroup == false) {
+              response.data[i].name = response.data[i].name.replace(this.$store.state.username, "")
+            }this.chats.push(response.data[i])
+          }
         })
         },
         chatpath(sender) {
@@ -113,11 +121,10 @@ import VueNativeSock from 'vue-native-websocket'
           })
           this.$socket.onopen = () => { 
             console.log('connection successful')
-            console.log('here')
-              }
              this.chatlist = false
              this.$store.commit('activechat', sender)
              this.$router.push({ name: 'CurrentChat', params: {sender} })
+              }
          },
          clearMessage(){
            this.searchchat = ''
@@ -132,7 +139,12 @@ import VueNativeSock from 'vue-native-websocket'
         this.axios.get('http://localhost:8000/chat/', 
         {params: { username : this.$store.state.username}
         }).then((response) => {
-          this.chats = response.data
+          for (var i = 0; i< response.data.length; i++){
+            if (response.data[i].isGroup == false) {
+              response.data[i].name = response.data[i].name.replace(this.$store.state.username, "")
+            console.log(response.data[i].name)
+            }this.chats.push(response.data[i])
+          }
         }).catch(error => {
           alert(error) }),
         this.axios.get('http://localhost:8000/chat/users/').then(response =>{

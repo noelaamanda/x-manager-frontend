@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <div>
+    <v-btn>
       <v-chip color="white">
         <v-avatar>
           <img src="../assets/user.png">
@@ -11,7 +11,7 @@
         <strong>{{ msgcontent }}</strong>
       </div>
       <br>{{ msgtime }}
-    </div>
+    </v-btn>
   </v-container> 
 </template>
 

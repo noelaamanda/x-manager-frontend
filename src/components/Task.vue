@@ -10,6 +10,7 @@
             <div>
               <h3 class="headline mb-0" style="color: teal">New Task</h3>
               <v-text-field label="Name" v-model="entry.name"></v-text-field>
+              <v-text-field label="Description" v-model="entry.description"></v-text-field>
               <v-autocomplete v-model="members" :items="contacts" item-text="username" multiple
                ></v-autocomplete>
               <v-dialog
@@ -41,10 +42,10 @@
       <v-list v-if="items">
         <template v-for="(item, index) in items">
           <v-list-tile  
-           :key="item.title" avatar ripple @click="taskpath(item.id)"
+           :key="item.name" avatar ripple @click="taskpath(item.id)"
           >
             <v-list-tile-content>
-              <v-list-tile-title> {{item.title}} </v-list-tile-title>
+              <v-list-tile-title> {{item.name}} </v-list-tile-title>
             </v-list-tile-content>
             <v-list-tile-action>
               <v-icon
@@ -79,19 +80,14 @@
                 <v-tab ripple>
                   Modify
                 </v-tab>
-                <v-tab-item>
-                  <v-text-field readonly label="Name">
-                   {{activeitems.name}}
-                  </v-text-field>
-                  <v-text-field readonly label="Members">
-                   {{activeitems.participants}}
-                  </v-text-field>
-                  <v-text-field readonly label="Start Date">
-                   {{activeitems.start}}
-                  <v-text-field readonly label="Estimated Time In Days">
-                   {{activeitems.estimation}}
-                  </v-text-field>
-                  </v-text-field>
+                <v-tab-item> 
+                  <p><Strong>Name:</strong> {{activeitems.name}} </p>
+                  <p><Strong>Members:</strong>
+                    <span>{{activeitems.members}}</span> 
+                  </p>
+                  <p><Strong>Description:</strong> {{activeitems.Description}} </p>
+                  <p><Strong>Start:</strong> {{activeitems.start}} </p>
+                  <p><Strong>Estimated time:</strong> {{activeitems.estimation}} </p>
                 </v-tab-item>
                 <v-tab-item>
                   <v-card>
@@ -144,7 +140,7 @@
       data () {
         return {
           taskid: 0, 
-          selected:[2],
+          selected:[0],
           items: [], 
           newtask: false,
           entry: {},
@@ -179,17 +175,25 @@
           } 
           parti.push(this.$store.state.user_id)
           this.axios.post('http://localhost:8000/task/create/',
-          {'name' :this.entry.name, 'estimation': this.entry.time, 'participants': parti,'start': this.date}
+          {'name' :this.entry.name,'Description': this.entry.description, 'estimation': this.entry.time, 'participants': parti,'start': this.date}
           ).then(response =>{
           console.log(response.data)
         })
           alert('task created')
+          this.axios.get('http://localhost:8000/task/', 
+        {params: { username : this.$store.state.username}
+        }).then((response) => {
+          this.items = []
+          this.items.push(response.data)
+        })
         },
         taskpath(id){
-          this.viewtask = true
-          this.axios.get(`http://localhost:8000/${id}`).then(response =>{
+          this.axios.get(`http://localhost:8000/task/${id}`).then(response =>{
           this.activeitems = response.data
-         })
+          this.viewtask = true
+          console.log(response.data)
+          console.log(this.activeitems)
+         }) 
           this.taskid = id
         },
         modify() {
